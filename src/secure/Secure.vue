@@ -1,54 +1,51 @@
 <template>
-  <Nav />
+  <Nav :user="user" />
   <div class="container-fluid">
     <div class="row">
       <Menu></Menu>
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-        <h2>Section title</h2>
-        <div class="table-responsive">
-          <table class="table table-striped table-sm">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Header</th>
-                <th scope="col">Header</th>
-                <th scope="col">Header</th>
-                <th scope="col">Header</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1,001</td>
-                <td>random</td>
-                <td>data</td>
-                <td>placeholder</td>
-                <td>text</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <router-view />
       </main>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Menu from "@/components/Menu.vue";
-import Nav from "@/components/Nav.vue";
+import { onMounted, ref } from "vue";
+import Menu from "@/secure/components/Menu.vue";
+import Nav from "@/secure/components/Nav.vue";
+import axios from "axios";
+import { useRouter } from "vue-router";
+
 export default {
   name: "Secure",
   components: {
     Menu,
     Nav,
   },
-  data() {
-    return {};
+  setup() {
+    const router = useRouter();
+    const user = ref(null);
+
+    onMounted(async () => {
+      try {
+        const response = await axios.get("users");
+
+        user.value = response.data.data;
+      } catch (e) {
+        await router.push("/login");
+      }
+    });
+
+    return {
+      user,
+    };
   },
   methods: {},
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 body {
   font-size: 0.875rem;
 }
